@@ -8,6 +8,8 @@
 
 #include "range.h"
 
+class MyTest {};
+
 int main(int, char **) {
   auto range_to_string = [&](fpa::Range<int> &r) {
     for (auto v : r) {
@@ -42,7 +44,7 @@ int main(int, char **) {
   auto rrange2d_to_string = [&](fpa::RRange2D<int> &rr2d) {
     int i = 0;
     for (auto &r2d : rr2d) {
-      range2d_to_string(r2d, r2d.col_.size());
+      range2d_to_string(r2d, r2d.unit());
     }
     std::cout << "\n";
   };

@@ -177,10 +177,10 @@ public:
     return row_ != rhs.row_ || col_ != rhs.col_;
   }
 
+  inline typename iterator::difference_type unit() { return col_.size(); }
+
 private:
   Range<TROW> row_;
-
-public:
   Range<TCOL> col_;
 
 private:
@@ -215,7 +215,7 @@ public:
       (*this) = container_->cend();
     } else {
       //  the next is normal
-      auto offset = (container_->delta_ - container_->overlap_);
+      auto offset = (container_->unit_ - container_->overlap_);
       // if the next is not a whole Range, shrink to fit size.
       begin += offset;
       end += std::min(offset, container_->end_ - end);
@@ -248,17 +248,17 @@ public:
 public:
   RRange()
       : begin_(static_cast<T>(0)), end_(static_cast<T>(0)),
-        delta_(static_cast<T>(0)) {}
-  RRange(T begin, T end, T delta, T overlap)
-      : begin_(begin), end_(end), delta_(delta), overlap_(overlap) {}
+        unit_(static_cast<T>(0)) {}
+  RRange(T begin, T end, T unit, T overlap)
+      : begin_(begin), end_(end), unit_(unit), overlap_(overlap) {}
 
   inline iterator cbegin() const {
     return empty() ? cend()
-                   : iterator(begin_, std::min(begin_ + delta_, end_), this);
+                   : iterator(begin_, std::min(begin_ + unit_, end_), this);
   }
   inline iterator begin() {
     return empty() ? end()
-                   : iterator(begin_, std::min(begin_ + delta_, end_), this);
+                   : iterator(begin_, std::min(begin_ + unit_, end_), this);
   }
 
   inline iterator cend() const { return iterator(end_, end_, this); }
@@ -270,20 +270,20 @@ public:
   inline bool empty() const { return begin_ >= end_; }
 
 private:
-  // 各个iterator的范围是delta_个值
+  // 各个iterator的范围是unit_个值
   // 各个iterator直接重叠overlap_个值
   // 举例
-  // 假设overlap_=3, delta_=8, 当前RangeR: [-10, 15), 则:
-  // begin iter: [-10, -2), delta_: 8
-  // next1 iter: [-5, 3), delta_: 8, 与begin iter重叠了3个值: [-5, -4, -3]
-  // next2 Iter: [0, 8), delta_: 8, 与next1 iter重叠了3个值: [0, 1, 2]
-  // next3 Iter: [5, 13), delta_: 8, 与next2 iter重叠了3个值: [5, 6, 7]
-  // next4 Iter: [10, 15), delta_: 5, 与next3 iter重叠了3个值: [10, 11, 12]
-  // 且next4 iter不是一个完整的delta_范围, 被缩减至适应范围了
-  // end Iter: [15, 15), delta_: 0, 不含有效范围
+  // 假设overlap_=3, unit_=8, 当前RangeR: [-10, 15), 则:
+  // begin iter: [-10, -2), unit_: 8
+  // next1 iter: [-5, 3), unit_: 8, 与begin iter重叠了3个值: [-5, -4, -3]
+  // next2 Iter: [0, 8), unit_: 8, 与next1 iter重叠了3个值: [0, 1, 2]
+  // next3 Iter: [5, 13), unit_: 8, 与next2 iter重叠了3个值: [5, 6, 7]
+  // next4 Iter: [10, 15), unit_: 5, 与next3 iter重叠了3个值: [10, 11, 12]
+  // 且next4 iter不是一个完整的unit_范围, 被缩减至适应范围了
+  // end Iter: [15, 15), unit_: 0, 不含有效范围
   T begin_;
   T end_;
-  T delta_;
+  T unit_;
   T overlap_;
 };
 
@@ -360,26 +360,26 @@ public:
 
 public:
   RRange2D() {}
-  RRange2D(TROW begin_row, TROW end_row, TROW delta_row, TROW overlap_row,
-           TCOL begin_col, TCOL end_col, TCOL delta_col, TCOL overlap_col)
-      : row_(begin_row, end_row, delta_row, overlap_row),
-        col_(begin_col, end_col, delta_col, overlap_col) {}
+  RRange2D(TROW begin_row, TROW end_row, TROW unit_row, TROW overlap_row,
+           TCOL begin_col, TCOL end_col, TCOL unit_col, TCOL overlap_col)
+      : row_(begin_row, end_row, unit_row, overlap_row),
+        col_(begin_col, end_col, unit_col, overlap_col) {}
 
   inline iterator cbegin() const {
     return empty()
                ? cend()
                : iterator(row_.begin_,
-                          std::min(row_.begin_ + row_.delta_, row_.end_),
+                          std::min(row_.begin_ + row_.unit_, row_.end_),
                           col_.begin_,
-                          std::min(col_.begin_ + col_.delta_, col_.end_), this);
+                          std::min(col_.begin_ + col_.unit_, col_.end_), this);
   }
   inline iterator begin() {
     return empty()
                ? end()
                : iterator(row_.begin_,
-                          std::min(row_.begin_ + row_.delta_, row_.end_),
+                          std::min(row_.begin_ + row_.unit_, row_.end_),
                           col_.begin_,
-                          std::min(col_.begin_ + col_.delta_, col_.end_), this);
+                          std::min(col_.begin_ + col_.unit_, col_.end_), this);
   }
 
   inline iterator cend() const {

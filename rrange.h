@@ -1,11 +1,10 @@
-#ifndef FPA_RANGE_H
-#define FPA_RANGE_H
+#ifndef FPA_RRANGE_H
+#define FPA_RRANGE_H
 
 #include <cstdint>
 #include <functional>
 
 namespace fpa {
-
 template <typename T> class RangeIterator;
 template <typename T> class Range;
 
@@ -389,4 +388,4 @@ private:
 };
 } // namespace fpa
 
-#endif // FPA_RANGE_H
+#endif // FPA_RRANGE_H

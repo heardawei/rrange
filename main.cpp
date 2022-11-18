@@ -6,7 +6,7 @@
 #include <sstream>
 #include <vector>
 
-#include "range.h"
+#include "rrange.h"
 
 int main(int, char **) {
   auto range_to_string = [&](fpa::Range<int> &r) {

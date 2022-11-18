@@ -8,8 +8,6 @@
 
 #include "range.h"
 
-class MyTest {};
-
 int main(int, char **) {
   auto range_to_string = [&](fpa::Range<int> &r) {
     for (auto v : r) {
